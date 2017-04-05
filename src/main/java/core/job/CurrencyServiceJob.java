@@ -5,8 +5,8 @@ package core.job;
  * Behpardaz
  */
 
-import core.Currency;
-import core.MicroServiceStates;
+import core.entity.Currency;
+import core.service.MicroServiceStates;
 import core.trigger.CurrencyThresholdTrigger;
 import core.trigger.TriggerCaller;
 import org.jsoup.Jsoup;

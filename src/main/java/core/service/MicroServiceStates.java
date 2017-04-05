@@ -1,5 +1,6 @@
-package core;
+package core.service;
 
+import core.entity.Currency;
 import util.DBHelper;
 
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package core.job;
 
-import core.Currency;
+import core.entity.Currency;
 import core.trigger.CurrencyAnalyticsTrigger;
 import core.trigger.TriggerCaller;
 import org.quartz.Job;

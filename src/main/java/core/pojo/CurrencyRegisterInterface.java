@@ -78,7 +78,7 @@ public class CurrencyRegisterInterface {
         try {
             if(serviceName.equalsIgnoreCase("upper"))
             CurrencyThresholdTrigger.addTreshold(this.filters.currencyType, this.filters.value, CurrencyThresholdTrigger.GOUP);
-            else if(serviceName.equalsIgnoreCase("upper"))
+            else if(serviceName.equalsIgnoreCase("lower"))
                 CurrencyThresholdTrigger.addTreshold(this.filters.currencyType, this.filters.value, CurrencyThresholdTrigger.GODOWN);
         } catch (IOException e) {
             e.printStackTrace();

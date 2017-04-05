@@ -1,7 +1,7 @@
 package util;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import core.Currency;
+import core.entity.Currency;
 import core.trigger.CurrencyThresholdTrigger;
 import core.trigger.TriggerCaller;
 

@@ -1,4 +1,4 @@
-package core;
+package core.entity;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import util.StringUtil;

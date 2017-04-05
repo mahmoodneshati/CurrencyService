@@ -1,5 +1,6 @@
-package core;
+package core.service;
 
+import core.entity.Currency;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
