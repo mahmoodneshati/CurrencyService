@@ -61,7 +61,7 @@ public class SDPCurrencyInterface {
         //service.insertCurrencyDailyService();\
         JSONObject jsonObject = new JSONObject();
         try {
-            ArrayList<Currency> newCurrencies = CurrencyDailyService.getInstance().callRemoteCurrencyService();
+            ArrayList<Currency> newCurrencies = CurrencyDailyService.getInstance().callRemoteGoldService();
             for (Currency next : newCurrencies) {
                 if(next.englishName==null)
                     continue;

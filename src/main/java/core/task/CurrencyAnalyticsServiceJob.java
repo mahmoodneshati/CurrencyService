@@ -1,4 +1,4 @@
-package core.job;
+package core.task;
 
 import core.entity.Currency;
 import core.trigger.CurrencyAnalyticsTrigger;

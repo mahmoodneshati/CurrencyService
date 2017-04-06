@@ -1,4 +1,4 @@
-package core.job;
+package core.task;
 
 /**
  * Created by neshati on 1/22/2017.
@@ -86,7 +86,7 @@ public class CurrencyServiceJob implements Job {
 
     protected void updateMicroServiceStateVariables(ArrayList<Currency> newCurrencies) {
         for (Currency currency : newCurrencies) {
-            MicroServiceStates.getInstance().setLastPrice(currency);
+            MicroServiceStates.getInstance().setLastCurrencyPrice(currency);
         }
 
     }
@@ -113,12 +113,12 @@ public class CurrencyServiceJob implements Job {
     }
 
     private ArrayList<TriggerCaller> getTresholdTriggers(Currency currency) {
-        Double lastPrice = MicroServiceStates.getInstance().getLastPrice(currency.englishName);
+        Double lastPrice = MicroServiceStates.getInstance().getLastCurrencyPrice(currency.englishName);
 
         ArrayList<TriggerCaller> allTreshholds = new ArrayList<>();
         if (lastPrice == null) return allTreshholds;
         ArrayList<TriggerCaller> validTreshholdsLower =
-                DBHelper.getInstance().getValidCurrencyTresholdsLower(currency.englishName,
+                DBHelper.getInstance().generateLowerCurrencyThresholdTriggers(currency.englishName,
                         lastPrice,
                         currency.price);
         ArrayList<TriggerCaller> validTreshholdsUpper =

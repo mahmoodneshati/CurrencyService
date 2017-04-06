@@ -13,14 +13,16 @@ public class Gold {
     public String persianName;
     public String englishName;
     public Double price;
+    public Double hobab;
 
-    public Gold(String persianName, String englishName, Double price) {
+    public Gold(String persianName, String englishName, Double price, Double hobab) {
         this.persianName = persianName;
         if (englishName == null)
             this.englishName = getEnglishName(persianName);
         else if (persianName == null)
             this.persianName = getPersianName(englishName);
         this.price = price;
+        this.hobab = hobab;
     }
 
     private String getEnglishName(String persianName) {
@@ -43,7 +45,7 @@ public class Gold {
 
     @Override
     public String toString() {
-        return persianName + "\t" + englishName + "\t" + price;
+        return persianName + "\t" + englishName + "\t" + price + "\t" + hobab;
 
     }
 }

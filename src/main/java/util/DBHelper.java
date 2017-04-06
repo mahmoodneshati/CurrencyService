@@ -2,6 +2,8 @@ package util;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import core.entity.Currency;
+import core.entity.Gold;
+import core.trigger.CoinThresholdTrigger;
 import core.trigger.CurrencyThresholdTrigger;
 import core.trigger.TriggerCaller;
 
@@ -10,10 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -30,19 +29,19 @@ public class DBHelper {
 
 
 
-    private String user = "sa";
-    private String password = "sdp@b3h";
-    private String dbName = "BPJ_SDP_MS_Currency";
-    private String host = "172.16.4.199";
-    private String port = "1433";
-    private String driverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private String connectionString = "jdbc:sqlserver://" +
-            host +
-            "\\SQLEXPRESS:" +
-            port +
-            ";databaseName=" +
-            dbName +
-            ";" ;
+    private String user;// = "sa";
+    private String password;// = "sdp@b3h";
+    private String dbName;// = "BPJ_SDP_MS_Currency";
+    private String host;// = "172.16.4.199";
+    private String port;// = "1433";
+    private String driverName;// = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    private String connectionString;// = "jdbc:sqlserver://" +
+            //host +
+            //"\\SQLEXPRESS:" +
+            //port +
+            //";databaseName=" +
+            //dbName +
+            //";" ;
 /*
             +
             "user=" +
@@ -110,44 +109,17 @@ public class DBHelper {
     public static DBHelper getInstance() {
         if (dbHelper == null) {
             dbHelper = new DBHelper();
+            dbHelper.init();
             dbHelper.initConnectionPooling();
         }
         return dbHelper;
     }
 
     private DBHelper() {
-
     }
 
 
-    public int insertCurrency(Currency currency) {
-        if (currency.englishName == null)
-            return -1;
-        Connection conn = getConnection();
 
-        try {
-            PreparedStatement statement
-                    = conn.prepareStatement("INSERT INTO currencyValue  VALUES(?,?,?)");
-            Calendar cal = Calendar.getInstance();
-            java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
-            statement.setString(1, currency.englishName);
-            statement.setDouble(2, currency.price);
-            statement.setTimestamp(3, timestamp);
-            int result = statement.executeUpdate();
-            statement.close();
-            conn.close();
-            return result;
-        } catch (Exception e) {
-            try {
-                assert conn != null;
-                conn.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
     public int insertCurrencyTreshhold(CurrencyThresholdTrigger threshold) {
         Connection conn = getConnection();
@@ -196,30 +168,14 @@ public class DBHelper {
         DBHelper.getInstance().insertCurrencyTreshhold(new CurrencyThreshold("USD", 1, 1));
         DBHelper.getInstance().deleteCurrencyTreshhold(new CurrencyThreshold("USD", 1, 1));
 */
+        //DBHelper.getInstance().insertCoinTreshhold(new CoinThresholdTrigger(StringUtil.Complete_Coin,1000,1,));
+
+        //DBHelper.getInstance().insertCoinTreshhold(new CoinThresholdTrigger(StringUtil.Complete_Coin, 1000, 1, null));
+
     }
 
 
-    public HashMap<String, Currency> loadLastPrice() {
-        HashMap<String, Currency> out = new HashMap();
-        String sql = "SELECT id, currencyName, value FROM currencyValue " +
-                "WHERE (id IN (SELECT MAX(id) FROM currencyValue GROUP BY currencyName))";
-        Connection connection = getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                String currencyName = resultSet.getString("currencyName");
-                double value = resultSet.getDouble("value");
-                Currency currency = new Currency(null, currencyName, value);
-                out.put(currencyName, currency);
-            }
-            statement.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return out;
-    }
 
     public ArrayList<TriggerCaller> getValidCurrencyTresholdsUpper(String englishName,
                                                               Double oldPrice,
@@ -257,9 +213,107 @@ public class DBHelper {
 
     }
 
-    public ArrayList<TriggerCaller> getValidCurrencyTresholdsLower(String englishName,
-                                                                   Double oldPrice,
-                                                                   Double newPrice) {
+
+
+    public double[] getLastWeekMeanSDTEV(String englishName) {
+        Connection conn = getConnection();
+        double outValue[] = new double[2];
+
+
+        try {
+            String sql = "SELECT " +
+                    "      avg([value]) as avg " +
+                    " ,stdev([value]) as std " +
+                    "  FROM currencyValue " +
+                    "  WHERE ins_datetime >= DATEADD(day,-7, GETDATE())" +
+                    "  and currencyName = '"+"?"+"'";
+
+            assert conn != null;
+            PreparedStatement statement
+                    = conn.prepareStatement(sql);
+
+            statement.setString(1, englishName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                outValue[0] = resultSet.getDouble("avg");
+                outValue[1] = resultSet.getDouble("std");
+            }
+            statement.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return outValue;
+    }
+
+    public void insertCoinTreshhold(CoinThresholdTrigger coinThresholdTrigger) {
+        Connection conn = getConnection();
+        try {
+            assert conn != null;
+            PreparedStatement statement
+                    = conn.prepareStatement("INSERT INTO cointhreshold  VALUES(?,?,?,?)");
+            Calendar cal = Calendar.getInstance();
+            java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
+            statement.setString(1, coinThresholdTrigger.coinType);
+            statement.setDouble(2, coinThresholdTrigger.treshold);
+            statement.setInt(3, coinThresholdTrigger.goUpper);
+            statement.setTimestamp(4, timestamp);
+            int result = statement.executeUpdate();
+            statement.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public Map<String,Gold> loadLastCoinPrice() {
+
+        HashMap<String, Gold> out = new HashMap();
+        String sql = "SELECT id, coinName, value FROM coinValue " +
+                "WHERE (id IN (SELECT MAX(id) FROM coinValue GROUP BY coinName))";
+        Connection connection = getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                String coinName = resultSet.getString("coinName");
+                double value = resultSet.getDouble("value");
+                Gold gold = new Gold(null, coinName, value,null);
+                out.put(coinName, gold);
+            }
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+    public HashMap<String, Currency> loadLastCurrencyPrice() {
+        HashMap<String, Currency> out = new HashMap();
+        String sql = "SELECT id, currencyName, value FROM currencyValue " +
+                "WHERE (id IN (SELECT MAX(id) FROM currencyValue GROUP BY currencyName))";
+        Connection connection = getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                String currencyName = resultSet.getString("currencyName");
+                double value = resultSet.getDouble("value");
+                Currency currency = new Currency(null, currencyName, value);
+                out.put(currencyName, currency);
+            }
+            statement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public ArrayList<TriggerCaller> generateLowerCurrencyThresholdTriggers(String englishName,
+                                                                           Double oldPrice,
+                                                                           Double newPrice) {
         Connection conn = getConnection();
         ArrayList<TriggerCaller> out = new ArrayList<>();
         try {
@@ -293,35 +347,126 @@ public class DBHelper {
 
     }
 
-
-    public double[] getLastWeekMeanSDTEV(String englishName) {
+    public ArrayList<TriggerCaller> generateLowerCoinThresholdTriggers(String englishName, Double oldPrice, Double newPrice) {
         Connection conn = getConnection();
-        double outValue[] = new double[2];
-
-
+        ArrayList<TriggerCaller> out = new ArrayList<>();
         try {
-            String sql = "SELECT " +
-                    "      avg([value]) as avg " +
-                    " ,stdev([value]) as std " +
-                    "  FROM currencyValue " +
-                    "  WHERE ins_datetime >= DATEADD(day,-7, GETDATE())" +
-                    "  and currencyName = '"+"?"+"'";
-
-            assert conn != null;
+            String sql = "SELECT DISTINCT " +
+                    "      [coinType]\n" +
+                    "      ,[VALUE]\n" +
+                    "      ,[goUpper]\n" +
+                    "  FROM [cointhreshold]\n" +
+                    "  WHERE [goUpper] =  "+ CoinThresholdTrigger.GODOWN + " AND (VALUE BETWEEN ? AND ?) AND [coinType] = ?";
             PreparedStatement statement
                     = conn.prepareStatement(sql);
 
-            statement.setString(1, englishName);
+            statement.setDouble(1, newPrice);
+            statement.setDouble(2, oldPrice);
+            statement.setString(3, englishName);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                outValue[0] = resultSet.getDouble("avg");
-                outValue[1] = resultSet.getDouble("std");
+            while (resultSet.next()) {
+                CoinThresholdTrigger ct = new CoinThresholdTrigger(
+                        resultSet.getString("coinType"),
+                        resultSet.getDouble("value"),
+                        resultSet.getInt("goUpper"),null);
+                out.add(ct);
             }
             statement.close();
             conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return outValue;
+        return out;
+    }
+
+    public ArrayList<TriggerCaller> generateUpperCoinThresholdTriggers(String englishName, Double oldPrice, Double newPrice) {
+        Connection conn = getConnection();
+        ArrayList<TriggerCaller> out = new ArrayList<>();
+        try {
+            String sql = "SELECT DISTINCT " +
+                    "      [coinType]\n" +
+                    "      ,[VALUE]\n" +
+                    "      ,[goUpper]\n" +
+                    "  FROM [cointhreshold]\n" +
+                    "  WHERE [goUpper] =  "+ CoinThresholdTrigger.GOUP + " AND (VALUE BETWEEN ? AND ?) AND [coinType] = ?";
+            PreparedStatement statement
+                    = conn.prepareStatement(sql);
+
+            statement.setDouble(1, oldPrice);
+            statement.setDouble(2, newPrice);
+            statement.setString(3, englishName);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                CoinThresholdTrigger ct = new CoinThresholdTrigger(
+                        resultSet.getString("coinType"),
+                        resultSet.getDouble("value"),
+                        resultSet.getInt("goUpper"),null);
+                out.add(ct);
+            }
+            statement.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return out;
+    }
+
+    public int insertCurrency(Currency currency) {
+        if (currency.englishName == null)
+            return -1;
+        Connection conn = getConnection();
+
+        try {
+            PreparedStatement statement
+                    = conn.prepareStatement("INSERT INTO currencyValue  VALUES(?,?,?)");
+            Calendar cal = Calendar.getInstance();
+            java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
+            statement.setString(1, currency.englishName);
+            statement.setDouble(2, currency.price);
+            statement.setTimestamp(3, timestamp);
+            int result = statement.executeUpdate();
+            statement.close();
+            conn.close();
+            return result;
+        } catch (Exception e) {
+            try {
+                assert conn != null;
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int insertCoin(Gold gold) {
+        if (gold.englishName == null)
+            return -1;
+        Connection conn = getConnection();
+
+        try {
+            PreparedStatement statement
+                    = conn.prepareStatement("INSERT INTO coinValue  VALUES(?,?,?,?)");
+            Calendar cal = Calendar.getInstance();
+            java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
+            statement.setString(1, gold.englishName);
+            statement.setDouble(2, gold.price);
+            statement.setDouble(3, gold.hobab);
+            statement.setTimestamp(4, timestamp);
+            int result = statement.executeUpdate();
+            statement.close();
+            conn.close();
+            return result;
+        } catch (Exception e) {
+            try {
+                assert conn != null;
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

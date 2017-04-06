@@ -88,7 +88,7 @@ public class SDPCoinInterface {
         out.put("priceArray",arrayPrice);
 
         try {
-            ArrayList<Gold> newGolds = GoldService.getInstance().callRemoteCurrencyService();
+            ArrayList<Gold> newGolds = GoldService.getInstance().callRemoteGoldService();
             int counter =0;
             for (Gold next : newGolds) {
                 if(next.englishName!=null) {
@@ -112,5 +112,16 @@ public class SDPCoinInterface {
     }
 
 
+    // The Java method will process HTTP GET requests
+    @Path("/HobabLevel")
+    @GET
+    // The Java method will produce content identified by the MIME Media type "text/plain"
+    @Produces("application/json")
+    public String getHobabLevel() throws JSONException {
+        JSONArray array = new JSONArray();
+        array.put(getJsonObject(StringUtil.Hobab_Level_HIGH, StringEscapeUtils.unescapeJava(StringUtil.Hobab_Level_HIGH_PERSIAN)));
+        array.put(getJsonObject(StringUtil.Hobab_Level_MEDIUM,StringEscapeUtils.unescapeJava(StringUtil.Hobab_Level_MEDIUM_PERSIAN)));
+        return array.toString();
+    }
 
 }

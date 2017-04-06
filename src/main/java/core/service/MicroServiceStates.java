@@ -1,6 +1,7 @@
 package core.service;
 
 import core.entity.Currency;
+import core.entity.Gold;
 import util.DBHelper;
 
 import java.util.HashMap;
@@ -11,7 +12,8 @@ import java.util.HashMap;
  */
 public class MicroServiceStates {
     private static MicroServiceStates ms;
-    private HashMap<String,Currency> lastPrice;
+    private HashMap<String,Currency> lastCurrencyPrice;
+    private HashMap<String,Gold> lastCoinPrice;
 
     public static MicroServiceStates getInstance(){
         if(ms==null){
@@ -20,16 +22,28 @@ public class MicroServiceStates {
         return ms;
     }
 
-    public Double getLastPrice(String currencyName){
-        if(lastPrice==null) {
-            lastPrice = new HashMap<>();
-            lastPrice.putAll(DBHelper.getInstance().loadLastPrice());
+    public Double getLastCurrencyPrice(String currencyName){
+        if(lastCurrencyPrice ==null) {
+            lastCurrencyPrice = new HashMap<>();
+            lastCurrencyPrice.putAll(DBHelper.getInstance().loadLastCurrencyPrice());
         }
-        return lastPrice.get(currencyName)==null?null:lastPrice.get(currencyName).price;
+        return lastCurrencyPrice.get(currencyName)==null?null: lastCurrencyPrice.get(currencyName).price;
 
     }
+    public Double getLastCoinPrice(String coinName) {
+        if(lastCoinPrice ==null) {
+            lastCoinPrice = new HashMap<>();
+            lastCoinPrice.putAll(DBHelper.getInstance().loadLastCoinPrice());
+        }
+        return lastCoinPrice.get(coinName)==null?null: lastCoinPrice.get(coinName).price;
+    }
 
-    public void setLastPrice(Currency newCurrency) {
-        lastPrice.put(newCurrency.englishName,newCurrency);
+    public void setLastCurrencyPrice(Currency newCurrency) {
+        lastCurrencyPrice.put(newCurrency.englishName, newCurrency);
+    }
+
+
+    public void setLastGoldPrice(Gold gold) {
+        lastCoinPrice.put(gold.englishName, gold);
     }
 }

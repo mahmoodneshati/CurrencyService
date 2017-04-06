@@ -1,7 +1,9 @@
 package job;
 
-import core.job.CurrencyAnalyticsServiceJob;
-import core.job.CurrencyServiceJob;
+import core.task.CoinAnalyticsServiceJob;
+import core.task.CoinServiceJob;
+import core.task.CurrencyAnalyticsServiceJob;
+import core.task.CurrencyServiceJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -22,6 +24,8 @@ public class CurrencyScheduler {
     private org.quartz.Scheduler scheduler;
     private String currencyAnalyticsServiceJobPattern;
     private String currencyServiceSchedulePattern;
+    private String coinServiceJobPattern;
+    private String CoinAnalyticsServiceJobPattern;
 
     public CurrencyScheduler() {
         try {
@@ -43,6 +47,8 @@ public class CurrencyScheduler {
         try {
             registerJob(CurrencyServiceJob.class, "CurrencyServiceJob", "group1", currencyServiceSchedulePattern);
             registerJob(CurrencyAnalyticsServiceJob.class, "CurrencyAnalyticsServiceJob", "group1", currencyAnalyticsServiceJobPattern);
+            registerJob(CoinServiceJob.class, "CoinServiceJob", "group1", coinServiceJobPattern);
+            registerJob(CoinAnalyticsServiceJob.class, "CoinAnalyticsServiceJob", "group1", CoinAnalyticsServiceJobPattern);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -55,6 +61,9 @@ public class CurrencyScheduler {
             prop.load(input);
             currencyServiceSchedulePattern = prop.getProperty("currencyServiceSchedulePattern");
             currencyAnalyticsServiceJobPattern = prop.getProperty("currencyAnalyticsServiceJobPattern");
+            coinServiceJobPattern = prop.getProperty("coinServiceJobPattern");
+            CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
+
         } catch (IOException e) {
             e.printStackTrace();
         }

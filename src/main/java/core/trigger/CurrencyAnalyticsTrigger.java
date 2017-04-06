@@ -41,7 +41,7 @@ public class CurrencyAnalyticsTrigger extends TriggerCaller {
             params = new HashMap<>();
             InputStream input = new FileInputStream("config.properties");
             prop.load(input);
-            sdpTriggerAnalytics= prop.getProperty("sdpTriggerAnalytics");
+            sdpTriggerAnalytics= prop.getProperty("sdpTriggerCurrencyAnalytics");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,15 +1,20 @@
 package core.service;
 
+import core.entity.Currency;
 import core.entity.Gold;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import util.StringUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.function.DoubleToLongFunction;
 
 import static util.StringUtil.convertPersianDigitToEnglish;
 
@@ -21,6 +26,7 @@ public class GoldService {
     private static GoldService service;
     private static Properties prop = new Properties();
     private static String serviceURL;
+    private final double haghZarb = 50000;
 
 
     public static GoldService getInstance() {
@@ -47,17 +53,70 @@ public class GoldService {
         return null;
     }
 
-    public ArrayList<Gold> callRemoteCurrencyService() throws IOException {
+    public ArrayList<Gold> callRemoteGoldService() throws IOException {
         Document doc = Jsoup.connect(serviceURL).get();
         Elements gold_items = doc.select("item");
+        Double ons_gold_price = getGoldOnsPrice(doc);
+        Double usd_price = getUSDPrice();
         ArrayList<Gold> newGolds = new ArrayList<>();
         for (org.jsoup.nodes.Element goldItem : gold_items) {
             String goldName = goldItem.select("name").get(0).text().trim();
             Double goldPrice = getDoubleValue(goldItem.select("price").get(0).text());
-            Gold gold = new Gold(goldName, null, goldPrice);
+            Gold gold = new Gold(goldName, null, goldPrice,getHobabPrice(goldName,ons_gold_price,usd_price));
             newGolds.add(gold);
         }
         return newGolds;
+    }
+
+    private Double getUSDPrice() {
+        try {
+            ArrayList<Currency> curencyList = CurrencyDailyService.getInstance().callRemoteCurrencyService();
+            for (Currency next : curencyList) {
+                if (next.englishName.equalsIgnoreCase("USD")) {
+                    return next.price;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    private Double getGoldOnsPrice(Document doc) {
+        Elements gold_items = doc.select("item");
+        for (org.jsoup.nodes.Element goldItem : gold_items) {
+
+            String goldName = goldItem.select("name").get(0).text().trim();
+            goldName = StringEscapeUtils.escapeJava(goldName);
+            if(goldName.equalsIgnoreCase(StringUtil.ONS_GOLD_PERSIAN)) {
+                return getDoubleValue(goldItem.select("price").get(0).text());
+            }
+        }
+        return null;
+    }
+
+    private Double getHobabPrice(String goldName, Double ons_gold_price, Double usd_price) {
+        Double weight = null;
+        switch (goldName){
+            case StringUtil.Complete_Coin_PERSIAN:
+                weight = 8.133;
+                break;
+            case StringUtil.Half_Coin_PERSIAN:
+                weight = 4.066;
+                break;
+            case StringUtil.ROB_Coin_PERSIAN:
+                weight = 2.033;
+                break;
+            case StringUtil.GERAMI_Coin_PERSIAN:
+                weight = 1.0;
+                break;
+
+        }
+        if(weight==null) return null;
+
+
+        return haghZarb + (weight*0.916* (ons_gold_price * usd_price/31.1));
     }
 
     private Double getDoubleValue(String price) {

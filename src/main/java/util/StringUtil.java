@@ -31,18 +31,31 @@ public class StringUtil {
     private static HashMap<String, String> goldName_goldSymbol;
     private static HashMap<String, String> goldSymbol_goldName;
 
-    public static String Complete_Coin = "Complete_Coin";
-    public static String Complete_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0628\\u0647\\u0627\\u0631 \\u0622\\u0632\\u0627\\u062F\\u06CC";
+    public static final String Complete_Coin = "Complete_Coin";
+    public static final String Complete_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0628\\u0647\\u0627\\u0631 \\u0622\\u0632\\u0627\\u062F\\u06CC";
 
-    public static String GERAMI_Coin = "GERAMI_Coin";
-    public static String GERAMI_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u06AF\\u0631\\u0645\\u06CC";
+    public static final String GERAMI_Coin = "GERAMI_Coin";
+    public static final String GERAMI_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u06AF\\u0631\\u0645\\u06CC";
 
 
-    public static String Half_Coin = "Half_Coin";
-    public static String Half_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0646\\u06CC\\u0645";
+    public static final String Half_Coin = "Half_Coin";
+    public static final String Half_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0646\\u06CC\\u0645";
 
-    public static String ROB_Coin = "ROB_Coin";
-    public static String ROB_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0631\\u0628\\u0639";
+    public static final String ROB_Coin = "ROB_Coin";
+    public static final String ROB_Coin_PERSIAN = "\\u0633\\u06A9\\u0647 \\u0631\\u0628\\u0639";
+    public static final String ONS_GOLD_PERSIAN = "\\u0627\\u0646\\u0633 \\u0637\\u0644\\u0627";
+
+
+    /*_______________________ Coin Hobab ____________________________*/
+
+    public static final String Hobab_Level_HIGH_PERSIAN = "\\u062D\\u0628\\u0627\\u0628 \\u0632\\u06CC\\u0627\\u062F";
+    public static final String Hobab_Level_HIGH = "Hobab_Level_HIGH";
+
+    public static final String Hobab_Level_MEDIUM_PERSIAN = "\\u062D\\u0628\\u0627\\u0628 \\u0645\\u062A\\u0648\\u0633\\u0637";
+    public static final String Hobab_Level_MEDIUM = "Hobab_Level_MEDIUM";
+
+
+
 
 
     public static HashMap<String, String> GoldNameMapper() {
