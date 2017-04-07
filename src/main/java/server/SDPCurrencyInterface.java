@@ -1,10 +1,31 @@
 package server;
 
+import com.sun.jersey.api.container.httpserver.HttpServerFactory;
+import com.sun.net.httpserver.HttpServer;
+import core.entity.Currency;
+import core.pojo.CurrencyDailyInterface;
+import core.pojo.CurrencyRegisterInterface;
+import core.service.CurrencyDailyService;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import util.StringUtil;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Properties;
+
 /**
  * Created by neshati on 1/29/2017.
  Behpardaz
  */
-/*
+
 @Path("/currency")
 public class SDPCurrencyInterface {
     private static Properties prop = new Properties();
@@ -61,7 +82,7 @@ public class SDPCurrencyInterface {
         //service.insertCurrencyDailyService();\
         JSONObject jsonObject = new JSONObject();
         try {
-            ArrayList<Currency> newCurrencies = CurrencyDailyService.getInstance().callRemoteGoldService();
+            ArrayList<Currency> newCurrencies = CurrencyDailyService.getInstance().callRemoteCurrencyService();
             for (Currency next : newCurrencies) {
                 if(next.englishName==null)
                     continue;
@@ -120,4 +141,4 @@ public class SDPCurrencyInterface {
 
 
 }
-*/
+
