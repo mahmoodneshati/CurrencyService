@@ -12,6 +12,7 @@ import util.DBHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Mahmood on 4/6/2017.
@@ -23,7 +24,16 @@ public class CoinServiceJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         System.out.println("Checking for coin threshold service!");
+        printDateTime();
         runService();
+    }
+
+    private void printDateTime() {
+        Calendar cal = Calendar.getInstance();
+        java.sql.Timestamp timestamp = new java.sql.Timestamp(cal.getTimeInMillis());
+        String time = timestamp.getHours() + ":" + timestamp.getMinutes() +":"+timestamp.getSeconds();
+        String date = timestamp.getYear() + "/" + timestamp.getMonth() +"/"+timestamp.getDate();
+        System.out.println(date +"\t" +time);
     }
 
     private void runService() {

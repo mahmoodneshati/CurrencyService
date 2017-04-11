@@ -52,7 +52,7 @@ public class JobScheduler {
             input = new FileInputStream("config.properties");
             prop.load(input);
             coinServiceJobPattern = prop.getProperty("coinServiceJobPattern");
-            CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
+            //CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
 
         } catch (IOException e) {
             e.printStackTrace();
