@@ -2,8 +2,6 @@ package job;
 
 import core.task.CoinAnalyticsServiceJob;
 import core.task.CoinServiceJob;
-import core.task.CurrencyAnalyticsServiceJob;
-import core.task.CurrencyServiceJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
@@ -16,18 +14,14 @@ import java.util.Properties;
  * Created by neshati on 2/7/2017.
  * Behpardaz
  */
-public class CurrencyScheduler {
-    //private static String EVERY30SECONDS = "0/20 * * * * ? *";
-    //private static String EVERYDAY8AM = "0 0 8 * * ? *";
+public class JobScheduler {
     private static Properties prop = new Properties();
 
     private org.quartz.Scheduler scheduler;
-    private String currencyAnalyticsServiceJobPattern;
-    private String currencyServiceSchedulePattern;
     private String coinServiceJobPattern;
     private String CoinAnalyticsServiceJobPattern;
 
-    public CurrencyScheduler() {
+    public JobScheduler() {
         try {
             this.scheduler = new StdSchedulerFactory().getScheduler();
         } catch (SchedulerException e) {
@@ -45,8 +39,6 @@ public class CurrencyScheduler {
 
     public void addJobs(){
         try {
-            registerJob(CurrencyServiceJob.class, "CurrencyServiceJob", "group1", currencyServiceSchedulePattern);
-            registerJob(CurrencyAnalyticsServiceJob.class, "CurrencyAnalyticsServiceJob", "group1", currencyAnalyticsServiceJobPattern);
             registerJob(CoinServiceJob.class, "CoinServiceJob", "group1", coinServiceJobPattern);
             registerJob(CoinAnalyticsServiceJob.class, "CoinAnalyticsServiceJob", "group1", CoinAnalyticsServiceJobPattern);
         } catch (SchedulerException e) {
@@ -59,8 +51,6 @@ public class CurrencyScheduler {
         try {
             input = new FileInputStream("config.properties");
             prop.load(input);
-            currencyServiceSchedulePattern = prop.getProperty("currencyServiceSchedulePattern");
-            currencyAnalyticsServiceJobPattern = prop.getProperty("currencyAnalyticsServiceJobPattern");
             coinServiceJobPattern = prop.getProperty("coinServiceJobPattern");
             CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
 
@@ -73,7 +63,7 @@ public class CurrencyScheduler {
 
 
     public static void main(String[] args) throws SchedulerException {
-        CurrencyScheduler scheduler = new CurrencyScheduler();
+        JobScheduler scheduler = new JobScheduler();
         scheduler.start();
         scheduler.setConfigs();
         scheduler.addJobs();

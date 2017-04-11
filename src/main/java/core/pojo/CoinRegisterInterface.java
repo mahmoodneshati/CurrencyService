@@ -1,7 +1,6 @@
 package core.pojo;
 
 import core.trigger.CoinThresholdTrigger;
-import core.trigger.CurrencyThresholdTrigger;
 
 import java.io.IOException;
 

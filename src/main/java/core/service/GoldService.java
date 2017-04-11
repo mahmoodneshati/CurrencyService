@@ -1,7 +1,7 @@
 package core.service;
 
-import core.entity.Currency;
 import core.entity.Gold;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,9 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.function.DoubleToLongFunction;
 
 import static util.StringUtil.convertPersianDigitToEnglish;
 
@@ -26,12 +24,14 @@ public class GoldService {
     private static GoldService service;
     private static Properties prop = new Properties();
     private static String serviceURL;
+    private static String currencyServiceURL;
+
     private final double haghZarb = 50000;
 
 
     public static GoldService getInstance() {
 
-        if(service==null){
+        if (service == null) {
             service = new GoldService();
             setConfigs();
 
@@ -42,11 +42,12 @@ public class GoldService {
     }
 
     private static String setConfigs() {
-        InputStream input ;
+        InputStream input;
         try {
             input = new FileInputStream("config.properties");
             prop.load(input);
             serviceURL = prop.getProperty("parsijoo_gold_service");
+            currencyServiceURL = prop.getProperty("parsijoo_currency_service");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,27 +60,35 @@ public class GoldService {
         Double ons_gold_price = getGoldOnsPrice(doc);
         Double usd_price = getUSDPrice();
         ArrayList<Gold> newGolds = new ArrayList<>();
-        for (org.jsoup.nodes.Element goldItem : gold_items) {
-            String goldName = goldItem.select("name").get(0).text().trim();
-            Double goldPrice = getDoubleValue(goldItem.select("price").get(0).text());
-            Gold gold = new Gold(goldName, null, goldPrice,getHobabPrice(goldName,ons_gold_price,usd_price));
-            newGolds.add(gold);
+        if (usd_price != null) {
+            for (org.jsoup.nodes.Element goldItem : gold_items) {
+                String goldName = goldItem.select("name").get(0).text().trim();
+                Double goldPrice = getDoubleValue(goldItem.select("price").get(0).text());
+                Gold gold = new Gold(goldName, null, goldPrice, getHobabPrice(goldName, ons_gold_price, usd_price));
+                newGolds.add(gold);
+            }
         }
         return newGolds;
     }
 
     private Double getUSDPrice() {
         try {
-            ArrayList<Currency> curencyList = CurrencyDailyService.getInstance().callRemoteCurrencyService();
-            for (Currency next : curencyList) {
-                if (next.englishName.equalsIgnoreCase("USD")) {
-                    return next.price;
+            Document doc = Jsoup.connect(currencyServiceURL).get();
+            Elements currency_items = doc.select("item");
+            for (org.jsoup.nodes.Element currencyItem : currency_items) {
+                String currencyName = currencyItem.select("name").get(0).text().trim();
+                Double currencyPrice = getDoubleValue(currencyItem.select("price").get(0).text());
+                if (StringEscapeUtils.escapeJava(currencyName).equalsIgnoreCase(StringUtil.USD_PERSIAN)) {
+                    return currencyPrice;
                 }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+
+
     }
 
 
@@ -89,7 +98,7 @@ public class GoldService {
 
             String goldName = goldItem.select("name").get(0).text().trim();
             goldName = StringEscapeUtils.escapeJava(goldName);
-            if(goldName.equalsIgnoreCase(StringUtil.ONS_GOLD_PERSIAN)) {
+            if (goldName.equalsIgnoreCase(StringUtil.ONS_GOLD_PERSIAN)) {
                 return getDoubleValue(goldItem.select("price").get(0).text());
             }
         }
@@ -98,7 +107,7 @@ public class GoldService {
 
     private Double getHobabPrice(String goldName, Double ons_gold_price, Double usd_price) {
         Double weight = null;
-        switch (goldName){
+        switch (StringEscapeUtils.escapeJava(goldName)) {
             case StringUtil.Complete_Coin_PERSIAN:
                 weight = 8.133;
                 break;
@@ -113,10 +122,10 @@ public class GoldService {
                 break;
 
         }
-        if(weight==null) return null;
+        if (weight == null) return null;
 
 
-        return haghZarb + (weight*0.916* (ons_gold_price * usd_price/31.1));
+        return haghZarb + (weight * 0.916 * (ons_gold_price * usd_price / 31.1));
     }
 
     private Double getDoubleValue(String price) {

@@ -1,10 +1,8 @@
 package core.task;
 
-import core.entity.Currency;
 import core.entity.Gold;
 import core.service.GoldService;
 import core.trigger.CoinAnalyticsTrigger;
-import core.trigger.TriggerCaller;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,7 +10,6 @@ import util.StringUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -43,8 +40,8 @@ public class CoinAnalyticsServiceJob implements Job {
     private void fireEligibleTriggers(ArrayList<Gold> newGold, String hobabLevel) {
         Gold completeCoin = getCompleteCoin(newGold);
         assert completeCoin != null;
-        CoinAnalyticsTrigger coinAnalyticsTrigger = new CoinAnalyticsTrigger(completeCoin.price,completeCoin.hobab,
-                Math.abs(completeCoin.price - completeCoin.hobab),hobabLevel);
+        CoinAnalyticsTrigger coinAnalyticsTrigger = new CoinAnalyticsTrigger(completeCoin.price,completeCoin.realPrice,
+                Math.abs(completeCoin.price - completeCoin.realPrice),hobabLevel);
         coinAnalyticsTrigger.fillParams();
         try {
             coinAnalyticsTrigger.fire();
@@ -66,9 +63,9 @@ public class CoinAnalyticsServiceJob implements Job {
     private String getCurrentHobabLevel(ArrayList<Gold> newCurrencies) {
         for (Gold next : newCurrencies) {
             if (Objects.equals(next.englishName, StringUtil.Complete_Coin)) {
-                if (Math.abs(next.price - next.hobab) > 1000000)
+                if (Math.abs(next.price - next.realPrice) > 1000000)
                     return StringUtil.Hobab_Level_HIGH;
-                else if (Math.abs(next.price - next.hobab) > 500000)
+                else if (Math.abs(next.price - next.realPrice) > 500000)
                     return StringUtil.Hobab_Level_MEDIUM;
             }
 

@@ -22,11 +22,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="CoinService" />
         <module name="CurrencyService" />
         <module name="InstagramService" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="CoinService" target="1.7" />
       <module name="CurrencyService" target="1.7" />
       <module name="InstagramService" target="1.7" />
     </bytecodeTargetLevel>

@@ -25,11 +25,11 @@ import java.util.Properties;
  * Created by neshati on 4/4/2017.
  * Behpardaz
  */
-@Path("/coin")
+
+@Path("coin")
 public class SDPCoinInterface {
     private static Properties prop = new Properties();
     private static String gold_endpoint;
-
 
 
     @GET
@@ -37,8 +37,8 @@ public class SDPCoinInterface {
     public String getCoinTypes() throws JSONException {
         JSONArray array = new JSONArray();
         array.put(getJsonObject(StringUtil.Complete_Coin, StringEscapeUtils.unescapeJava(StringUtil.Complete_Coin_PERSIAN)));
-        array.put(getJsonObject(StringUtil.Half_Coin,StringEscapeUtils.unescapeJava(StringUtil.Half_Coin_PERSIAN)));
-        array.put(getJsonObject(StringUtil.ROB_Coin,StringEscapeUtils.unescapeJava(StringUtil.ROB_Coin_PERSIAN)));
+        array.put(getJsonObject(StringUtil.Half_Coin, StringEscapeUtils.unescapeJava(StringUtil.Half_Coin_PERSIAN)));
+        array.put(getJsonObject(StringUtil.ROB_Coin, StringEscapeUtils.unescapeJava(StringUtil.ROB_Coin_PERSIAN)));
         return array.toString();
     }
 
@@ -63,7 +63,7 @@ public class SDPCoinInterface {
     }
 
     private static String setConfigs() {
-        InputStream input ;
+        InputStream input;
         try {
             input = new FileInputStream("config.properties");
             prop.load(input);
@@ -74,7 +74,7 @@ public class SDPCoinInterface {
         return null;
     }
 
-    @Path("/instant")
+    @Path("instant")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
@@ -83,15 +83,15 @@ public class SDPCoinInterface {
         JSONArray arrayEnglishName = new JSONArray();
         JSONArray arrayPersianName = new JSONArray();
         JSONArray arrayPrice = new JSONArray();
-        out.put("englishNameArray",arrayEnglishName);
-        out.put("persianNameArray",arrayPersianName);
-        out.put("priceArray",arrayPrice);
+        out.put("englishNameArray", arrayEnglishName);
+        out.put("persianNameArray", arrayPersianName);
+        out.put("priceArray", arrayPrice);
 
         try {
             ArrayList<Gold> newGolds = GoldService.getInstance().callRemoteGoldService();
-            int counter =0;
+            int counter = 0;
             for (Gold next : newGolds) {
-                if(next.englishName!=null) {
+                if (next.englishName != null) {
                     arrayEnglishName.put(counter, next.englishName);
                     arrayPersianName.put(counter, next.persianName);
                     arrayPrice.put(counter, next.price);
@@ -108,19 +108,19 @@ public class SDPCoinInterface {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerCurrenyService(CoinRegisterInterface service) throws JSONException {
         service.insertCoinThresholdService();
-        return  Response.status(200).build();
+        return Response.status(200).build();
     }
 
 
     // The Java method will process HTTP GET requests
-    @Path("/HobabLevel")
+    @Path("HobabLevel")
     @GET
     // The Java method will produce content identified by the MIME Media type "text/plain"
     @Produces("application/json")
     public String getHobabLevel() throws JSONException {
         JSONArray array = new JSONArray();
         array.put(getJsonObject(StringUtil.Hobab_Level_HIGH, StringEscapeUtils.unescapeJava(StringUtil.Hobab_Level_HIGH_PERSIAN)));
-        array.put(getJsonObject(StringUtil.Hobab_Level_MEDIUM,StringEscapeUtils.unescapeJava(StringUtil.Hobab_Level_MEDIUM_PERSIAN)));
+        array.put(getJsonObject(StringUtil.Hobab_Level_MEDIUM, StringEscapeUtils.unescapeJava(StringUtil.Hobab_Level_MEDIUM_PERSIAN)));
         return array.toString();
     }
 
