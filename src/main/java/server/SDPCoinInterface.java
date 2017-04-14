@@ -63,9 +63,9 @@ public class SDPCoinInterface {
     }
 
     private static String setConfigs() {
-        InputStream input;
         try {
-            input = new FileInputStream("config.properties");
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream input = loader.getResourceAsStream("config.properties");
             prop.load(input);
             gold_endpoint = prop.getProperty("gold_endpoint");
         } catch (IOException e) {
@@ -106,9 +106,13 @@ public class SDPCoinInterface {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerCurrenyService(CoinRegisterInterface service) throws JSONException {
-        service.insertCoinThresholdService();
-        return Response.status(200).build();
+        public Response registerCurrenyService(CoinRegisterInterface service) throws JSONException {
+        int result = service.insertCoinThresholdService();
+        if(result>0) {
+            return Response.status(200).build();
+        }else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
 
 

@@ -51,7 +51,8 @@ public class DBHelper {
 
     private void init(){
         try {
-            InputStream input = new FileInputStream("config.properties");
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream input = loader.getResourceAsStream("config.properties");
             prop.load(input);
             MIN_POOL_SIZE = Integer.parseInt(prop.getProperty("MIN_POOL_SIZE"));
             Acquire_Increment = Integer.parseInt(prop.getProperty("Acquire_Increment"));
@@ -121,7 +122,7 @@ public class DBHelper {
 
 
 
-    public void insertCoinTreshhold(CoinThresholdTrigger coinThresholdTrigger) {
+    public int insertCoinTreshhold(CoinThresholdTrigger coinThresholdTrigger) {
         Connection conn = getConnection();
         try {
             assert conn != null;
@@ -136,10 +137,12 @@ public class DBHelper {
             int result = statement.executeUpdate();
             statement.close();
             conn.close();
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
+        return 0;
     }
 
     public Map<String,Gold> loadLastCoinPrice() {

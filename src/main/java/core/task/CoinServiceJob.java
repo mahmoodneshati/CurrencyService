@@ -99,8 +99,4 @@ public class CoinServiceJob implements Job {
         return allThresholds;
     }
 
-    public static void main(String[] args) {
-        CoinServiceJob coinServiceJob = new CoinServiceJob();
-        coinServiceJob.runService();
-    }
 }

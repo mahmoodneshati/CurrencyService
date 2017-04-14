@@ -37,8 +37,8 @@ public class CoinThresholdTrigger extends TriggerCaller{
     private static String sdpCoinTriggerUpper;// = "http://172.16.4.199:1515/api/trigger/currency/upper";
     private static String sdpCoinTriggerLower;// = "http://172.16.4.199:1515/api/trigger/currency/lower";
 
-    public static void addTreshold(String coinType, double value, int flag) throws IOException {
-        DBHelper.getInstance().insertCoinTreshhold(new CoinThresholdTrigger(coinType, value, flag, null));
+    public static int addTreshold(String coinType, double value, int flag) throws IOException {
+        return DBHelper.getInstance().insertCoinTreshhold(new CoinThresholdTrigger(coinType, value, flag, null));
     }
 
     public CoinThresholdTrigger(String coinType, double treshold, int goUpper, Double currentValue) {
@@ -52,7 +52,11 @@ public class CoinThresholdTrigger extends TriggerCaller{
 
     private void init(){
         try {
-            InputStream input = new FileInputStream("config.properties");
+
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream input = loader.getResourceAsStream("config.properties");
+
+
             prop.load(input);
             sdpCoinTriggerUpper= prop.getProperty("sdpCoinTriggerUpper");
             sdpCoinTriggerLower= prop.getProperty("sdpCoinTriggerLower");

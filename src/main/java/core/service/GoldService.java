@@ -44,7 +44,8 @@ public class GoldService {
     private static String setConfigs() {
         InputStream input;
         try {
-            input = new FileInputStream("config.properties");
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            input = loader.getResourceAsStream("config.properties");
             prop.load(input);
             serviceURL = prop.getProperty("parsijoo_gold_service");
             currencyServiceURL = prop.getProperty("parsijoo_currency_service");

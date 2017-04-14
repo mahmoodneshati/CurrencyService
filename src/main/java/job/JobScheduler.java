@@ -47,12 +47,13 @@ public class JobScheduler {
     }
 
     private String setConfigs() {
-        InputStream input ;
         try {
-            input = new FileInputStream("config.properties");
+
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream input = loader.getResourceAsStream("config.properties");
             prop.load(input);
             coinServiceJobPattern = prop.getProperty("coinServiceJobPattern");
-            //CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
+            CoinAnalyticsServiceJobPattern = prop.getProperty("CoinAnalyticsServiceJobPattern");
 
         } catch (IOException e) {
             e.printStackTrace();

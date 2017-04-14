@@ -42,7 +42,8 @@ public class CoinAnalyticsTrigger extends TriggerCaller {
     private void init(){
         try {
             params = new HashMap<>();
-            InputStream input = new FileInputStream("config.properties");
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream input = loader.getResourceAsStream("config.properties");
             prop.load(input);
             sdpTriggerCoinAnalytics= prop.getProperty("sdpTriggerCoinAnalytics");
         } catch (IOException e) {

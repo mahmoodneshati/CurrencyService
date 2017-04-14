@@ -2,12 +2,14 @@ package core.pojo;
 
 import core.trigger.CoinThresholdTrigger;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
 
 /**
  * Created by Mahmood on 4/5/2017.
  * mahmood.neshati@gmail.com
  */
+@XmlRootElement
 public class CoinRegisterInterface {
     private int sdp_appletId;
     private int sdp_userId;
@@ -15,6 +17,11 @@ public class CoinRegisterInterface {
     private String serviceName;
     private FilterVaribales filters;
     private ChannelUserData channelUserData;
+
+    @Override
+    public String toString() {
+        return "channel_Name ="+ channelName +" service_Name = "+serviceName;
+    }
 
     public int getSdp_appletId() {
         return sdp_appletId;
@@ -64,23 +71,25 @@ public class CoinRegisterInterface {
         this.channelUserData = channelUserData;
     }
 
-    public void insertCoinThresholdService() {
+    public int insertCoinThresholdService() {
         // This function act like service registration switch.
         // Decide about the service that should be registered using the serviceName attribute of the the incoming registration request!
+        int result =0;
         try {
             if(serviceName.equalsIgnoreCase("upper"))
-                CoinThresholdTrigger.addTreshold(this.filters.coinType, this.filters.treshold, CoinThresholdTrigger.GOUP);
+                result = CoinThresholdTrigger.addTreshold(this.filters.coinType, this.filters.tresholdValue, CoinThresholdTrigger.GOUP);
             else if(serviceName.equalsIgnoreCase("lower"))
-                CoinThresholdTrigger.addTreshold(this.filters.coinType, this.filters.treshold, CoinThresholdTrigger.GODOWN);
+                result = CoinThresholdTrigger.addTreshold(this.filters.coinType, this.filters.tresholdValue, CoinThresholdTrigger.GODOWN);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
 
     }
 
     static class FilterVaribales {
         private String coinType;
-        private double treshold;
+        private double tresholdValue;
 
         public String getCoinType() {
             return coinType;
@@ -90,12 +99,12 @@ public class CoinRegisterInterface {
             this.coinType = coinType;
         }
 
-        public double getTreshold() {
-            return treshold;
+        public double getTresholdValue() {
+            return tresholdValue;
         }
 
-        public void setTreshold(double treshold) {
-            this.treshold = treshold;
+        public void setTresholdValue(double tresholdValue) {
+            this.tresholdValue = tresholdValue;
         }
     }
 
