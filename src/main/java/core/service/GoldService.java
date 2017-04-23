@@ -1,16 +1,15 @@
 package core.service;
 
 import core.entity.Gold;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import util.StringUtil;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -141,4 +140,39 @@ public class GoldService {
     }
 
 
+    public String getCurrentPriceMessage() {
+        try {
+            ArrayList<Gold> newGolds = GoldService.getInstance().callRemoteGoldService();
+            double seke_kamel=0, seke_nim=0, seke_rob=0, seke_gerami=0;
+            for (Gold next : newGolds) {
+                if(next.englishName==null) continue;
+                switch (next.englishName) {
+                    case StringUtil.Complete_Coin:
+                    seke_kamel = next.price;
+                    break;
+                    case StringUtil.Half_Coin:
+                    seke_nim = next.price;
+                    break;
+                    case StringUtil.ROB_Coin:
+                    seke_rob = next.price;
+                    break;
+                    case StringUtil.GERAMI_Coin:
+                    seke_gerami = next.price;
+                    break;
+                }
+            }
+            return MessageFormat.format("<p>قیمت انواع سکه به شرح زیر است</p>\n" +
+                    "<ul>\n" +
+                    "<li>قیمت تمام سکه بهار آزادی مبلغ {0,number,currency}&nbsp;است</li>\n" +
+                    "<li>قیمت نیم سکه بهار آزادی مبلغ {1,number,currency}&nbsp;است</li>\n" +
+                    "<li>قیمت ربع سکه بهار آزادی مبلغ {2,number,currency}&nbsp;است</li>\n" +
+                    "<li>قیمت سکه گرمی مبلغ {3,number,currency}&nbsp;است</li>\n" +
+                    "</ul>", seke_kamel, seke_nim, seke_rob, seke_gerami);
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return "خطا در دسترسی به سرویس رخ داده است.";
+
+    }
 }

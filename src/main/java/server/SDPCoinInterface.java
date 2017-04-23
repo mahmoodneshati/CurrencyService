@@ -2,7 +2,6 @@ package server;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
-import core.entity.Gold;
 import core.pojo.CoinRegisterInterface;
 import core.pojo.GoldCurrentPriceRequest;
 import core.service.GoldService;
@@ -15,10 +14,9 @@ import util.StringUtil;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 /**
@@ -77,31 +75,12 @@ public class SDPCoinInterface {
     @Path("instant")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/json")
-    public String getCurrentGoldPrice(GoldCurrentPriceRequest goldPriceRequest) throws JSONException {
+    @Produces(MediaType.APPLICATION_JSON )
+    public String getCurrentGoldPrice(GoldCurrentPriceRequest goldPriceRequest) throws JSONException, UnsupportedEncodingException {
         JSONObject out = new JSONObject();
-        JSONArray arrayEnglishName = new JSONArray();
-        JSONArray arrayPersianName = new JSONArray();
-        JSONArray arrayPrice = new JSONArray();
-        out.put("englishNameArray", arrayEnglishName);
-        out.put("persianNameArray", arrayPersianName);
-        out.put("priceArray", arrayPrice);
-
-        try {
-            ArrayList<Gold> newGolds = GoldService.getInstance().callRemoteGoldService();
-            int counter = 0;
-            for (Gold next : newGolds) {
-                if (next.englishName != null) {
-                    arrayEnglishName.put(counter, next.englishName);
-                    arrayPersianName.put(counter, next.persianName);
-                    arrayPrice.put(counter, next.price);
-                    counter++;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return out.toString();
+        String message= GoldService.getInstance().getCurrentPriceMessage();
+        out.put("message", message);
+        return new String(out.toString().getBytes(),"UTF-8");
     }
 
     @POST
