@@ -28,7 +28,7 @@ public class DBHelper {
 
 
     private String user;// = "sa";
-    private String password;// = "sdp@b3h";
+    private String password;//
     private String dbName;// = "BPJ_SDP_MS_Currency";
     private String host;// = "172.16.4.199";
     private String port;// = "1433";
